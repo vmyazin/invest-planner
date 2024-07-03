@@ -60,98 +60,108 @@ const ModernInvestmentDashboard = () => {
 
   return (
     <div className="p-4 max-w-6xl mx-auto bg-gray-100">
-      <h1 className="text-3xl font-bold mb-6 text-center text-blue-600">Investment Plan Dashboard</h1>
+      <h1 className="text-3xl font-bold mb-6 text-center text-primary">Investment Plan Dashboard</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4">Total Investment</h2>
-          <input 
-            type="range" 
-            min="1000" 
-            max="1000000" 
-            value={totalInvestment} 
-            onChange={(e) => setTotalInvestment(Number(e.target.value))}
-            className="w-full"
-          />
-          <p className="mt-2 text-lg font-medium">${totalInvestment.toLocaleString()}</p>
+          <h2 className="text-xl font-semibold mb-4 text-secondary">Total Investment</h2>
+          <div className="slider-container">
+            <input 
+              type="range" 
+              min="1000" 
+              max="1000000" 
+              value={totalInvestment} 
+              onChange={(e) => setTotalInvestment(Number(e.target.value))}
+              className="w-full"
+            />
+          </div>
+          <p className="mt-2 text-lg font-medium text-primary">${totalInvestment.toLocaleString()}</p>
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4">Risk Tolerance</h2>
-          <input 
-            type="range" 
-            min="1" 
-            max="10" 
-            value={riskTolerance} 
-            onChange={(e) => setRiskTolerance(Number(e.target.value))}
-            className="w-full"
-          />
-          <p className="mt-2 text-lg font-medium">{riskTolerance} / 10</p>
+          <h2 className="text-xl font-semibold mb-4 text-secondary">Risk Tolerance</h2>
+          <div className="slider-container">
+            <input 
+              type="range" 
+              min="1" 
+              max="10" 
+              value={riskTolerance} 
+              onChange={(e) => setRiskTolerance(Number(e.target.value))}
+              className="w-full"
+            />
+          </div>
+          <p className="mt-2 text-lg font-medium text-primary">{riskTolerance} / 10</p>
         </div>
       </div>
 
       <div className="bg-white p-6 rounded-lg shadow mt-6">
-        <h2 className="text-xl font-semibold mb-4">Allocations</h2>
+        <h2 className="text-xl font-semibold mb-4 text-secondary">Allocations</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {Object.entries(allocations).map(([symbol, value]) => (
             <div key={symbol} className="space-y-2">
-              <label className="flex justify-between">
+              <label className="flex justify-between text-secondary">
                 <span>{symbol} ({paymentFrequency[symbol]})</span>
                 <span className="font-medium">{value}%</span>
               </label>
-              <input 
-                type="range"
-                min="0"
-                max="100"
-                value={value}
-                onChange={(e) => handleAllocationChange(symbol, e.target.value)}
-                className="w-full"
-              />
-              <p className="text-sm text-gray-600">Yield: {yields[symbol]}%</p>
+              <div className="slider-container">
+                <input 
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={value}
+                  onChange={(e) => handleAllocationChange(symbol, e.target.value)}
+                  className="w-full"
+                />
+              </div>
+              <p className="text-sm text-primary">Yield: {yields[symbol]}%</p>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow mt-6">
-        <h2 className="text-xl font-semibold mb-4">Tax Settings</h2>
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            checked={includeStateTax}
-            onChange={(e) => setIncludeStateTax(e.target.checked)}
-            className="form-checkbox h-5 w-5 text-blue-600"
-          />
-          <label>Include State Tax</label>
-        </div>
-        {includeStateTax && (
-          <div className="mt-4">
-            <label>State Tax Rate: {stateTaxRate}%</label>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <div className="bg-white p-6 rounded-lg shadow mt-6">
+          <h2 className="text-xl font-semibold mb-4 text-secondary">Tax Settings</h2>
+          <div className="flex items-center space-x-2">
             <input
-              type="range"
-              min="0"
-              max="15"
-              value={stateTaxRate}
-              onChange={(e) => setStateTaxRate(Number(e.target.value))}
-              className="w-full mt-2"
+              type="checkbox"
+              checked={includeStateTax}
+              onChange={(e) => setIncludeStateTax(e.target.checked)}
+              className="form-checkbox h-5 w-5 text-accent"
             />
+            <label className="text-secondary">Include State Tax</label>
           </div>
-        )}
-      </div>
-
-      <div className="bg-white p-6 rounded-lg shadow mt-6">
-        <h2 className="text-xl font-semibold mb-4">Income Estimates</h2>
-        <div className="space-y-2">
-          <p><span className="font-medium">Annual (Pre-tax):</span> ${annualIncome.toFixed(2)}</p>
-          <p><span className="font-medium">Monthly (After-tax):</span> ${monthlyIncome.toFixed(2)}</p>
-          <p><span className="font-medium">Federal Tax Rate:</span> {federalTaxRate}%</p>
-          {includeStateTax && <p><span className="font-medium">State Tax Rate:</span> {stateTaxRate}%</p>}
-          <p><span className="font-medium">Total Tax Rate:</span> {includeStateTax ? federalTaxRate + stateTaxRate : federalTaxRate}%</p>
+          {includeStateTax && (
+            <div className="mt-4">
+              <label className="text-secondary">State Tax Rate: {stateTaxRate}%</label>
+              <input
+                type="range"
+                min="0"
+                max="15"
+                value={stateTaxRate}
+                onChange={(e) => setStateTaxRate(Number(e.target.value))}
+                className="w-full mt-2 accent-accent"
+              />
+            </div>
+          )}
         </div>
+
+        <div className="bg-white p-6 rounded-lg shadow mt-6">
+          <h2 className="text-xl font-semibold mb-4 text-secondary">Income Estimates</h2>
+          <div className="space-y-2 text-secondary">
+            <p><span className="font-medium">Annual (Pre-tax):</span> <span className="text-primary">${annualIncome.toFixed(2)}</span></p>
+            <p><span className="font-medium">Monthly (After-tax):</span> <span className="text-primary">${monthlyIncome.toFixed(2)}</span></p>
+            <p><span className="font-medium">Federal Tax Rate:</span> <span className="text-primary">{federalTaxRate}%</span></p>
+            {includeStateTax && <p><span className="font-medium">State Tax Rate:</span> <span className="text-primary">{stateTaxRate}%</span></p>}
+            <p><span className="font-medium">Total Tax Rate:</span> <span className="text-primary">{includeStateTax ? federalTaxRate + stateTaxRate : federalTaxRate}%</span></p>
+          </div>
+        </div>
+
       </div>
 
       <div className="bg-white p-6 rounded-lg shadow mt-6">
-        <h2 className="text-xl font-semibold mb-4">10-Year Projection</h2>
+        <h2 className="text-xl font-semibold mb-4 text-secondary">10-Year Projection</h2>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={generateProjections()}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -159,7 +169,7 @@ const ModernInvestmentDashboard = () => {
             <YAxis />
             <Tooltip />
             <Legend />
-            <Line type="monotone" dataKey="value" stroke="#3b82f6" />
+            <Line type="monotone" dataKey="value" stroke="#f6821e" />
           </LineChart>
         </ResponsiveContainer>
       </div>
