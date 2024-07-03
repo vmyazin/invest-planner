@@ -87,7 +87,7 @@ const ModernInvestmentDashboard = () => {
     <div className="p-4 max-w-6xl mx-auto bg-gray-100">
       <h1 className="text-3xl font-bold mb-6 text-center text-primary">Investment Plan Dashboard</h1>
 
-      <p className="text-center text-secondary mb-6 px-4 max-w- mx-auto">
+      <p className="text-center text-secondary mb-6 px-4 max-w-xl mx-auto">
         Plan and visualize your investment strategy focused on receiving dividents. 
         Adjust your total investment and risk tolerance to see how it affects your portfolio allocation and potential returns. 
       </p>
