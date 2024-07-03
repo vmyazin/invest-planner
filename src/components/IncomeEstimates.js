@@ -7,8 +7,8 @@ const IncomeEstimates = ({ annualIncome, monthlyIncome, federalTaxRate, includeS
     <div className="space-y-2 text-secondary">
       <p><span className="font-medium">Annual (Pre-tax):</span> <span className="text-primary">${annualIncome.toFixed(2)}</span></p>
       <p><span className="font-medium">Monthly (After-tax):</span> <span className="text-primary">${monthlyIncome.toFixed(2)}</span></p>
-      <p><span className="font-medium">Federal Tax Rate:</span> <span className="text-primary">{federalTaxRate}%</span></p>
-      {includeStateTax && <p><span className="font-medium">State Tax Rate:</span> <span className="text-primary">{stateTaxRate}%</span></p>}
+      <p><span className="font-medium">Federal Tax Rate:</span> <span className="text-primary">{federalTaxRate}%</span>
+      {includeStateTax && <span className='ps-6'><span className="font-medium">State Tax Rate:</span> <span className="text-primary">{stateTaxRate}%</span></span>}</p>
       <p><span className="font-medium">Total Tax Rate:</span> <span className="text-primary">{includeStateTax ? federalTaxRate + stateTaxRate : federalTaxRate}%</span></p>
     </div>
   </div>
