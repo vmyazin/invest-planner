@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Slider from './components/Slider';
+import AllocationDisplay from './components/AllocationDisplay';
 import IncomeEstimates from './components/IncomeEstimates';
 import ProjectionChart from './components/ProjectionChart';
 import TaxSettings from './components/TaxSettings';
+import { adjustAllocations } from './utils/allocationUtils';
 import config from './config';
 import './css/custom.css';
 
-const ModernInvestmentDashboard = () => {
+const Dashboard = () => {
   const [totalInvestment, setTotalInvestment] = useState(100000);
   const [riskTolerance, setRiskTolerance] = useState(5);
   const [allocations, setAllocations] = useState({
@@ -25,38 +27,13 @@ const ModernInvestmentDashboard = () => {
   const [stateTaxRate, setStateTaxRate] = useState(5);
   const federalTaxRate = 15;
 
-  // Function to adjust allocations based on risk tolerance
-  const adjustAllocations = useCallback((riskLevel) => {
-    setAllocations((prevAllocations) => {
-      const conservative = ['VTEB', 'JNJ', 'KO', 'PG'];
-      const moderate = ['SCHD', 'VIG', 'O', 'STAG'];
-      const aggressive = ['VTI', 'JEPI', 'XOM', 'MAIN'];
+  const handleAdjustAllocations = useCallback((riskLevel) => {
+    adjustAllocations(riskLevel, allocations, setAllocations);
+  }, [allocations, setAllocations]);
 
-      const newAllocations = { ...prevAllocations };
-      const totalAllocation = 100;
-
-      let conservativeAllocation = Math.max(60 - riskLevel * 5, 10);
-      let moderateAllocation = 30;
-      let aggressiveAllocation = Math.min(10 + riskLevel * 5, 60);
-
-      const total = conservativeAllocation + moderateAllocation + aggressiveAllocation;
-      conservativeAllocation = (conservativeAllocation / total) * totalAllocation;
-      moderateAllocation = (moderateAllocation / total) * totalAllocation;
-      aggressiveAllocation = (aggressiveAllocation / total) * totalAllocation;
-
-      conservative.forEach(symbol => newAllocations[symbol] = conservativeAllocation / conservative.length);
-      moderate.forEach(symbol => newAllocations[symbol] = moderateAllocation / moderate.length);
-      aggressive.forEach(symbol => newAllocations[symbol] = aggressiveAllocation / aggressive.length);
-
-      return newAllocations;
-    });
-  }, []);
-
-
-  // Update allocations when risk tolerance changes
   useEffect(() => {
-    adjustAllocations(riskTolerance);
-  }, [riskTolerance, adjustAllocations]);
+    handleAdjustAllocations(riskTolerance);
+  }, [riskTolerance, handleAdjustAllocations]);
 
   useEffect(() => {
     const income = Object.keys(allocations).reduce((sum, symbol) => {
@@ -76,12 +53,12 @@ const ModernInvestmentDashboard = () => {
   const handleRiskToleranceChange = (e) => {
     const newRiskTolerance = Number(e.target.value);
     setRiskTolerance(newRiskTolerance);
-    adjustAllocations(newRiskTolerance);
+    handleAdjustAllocations(newRiskTolerance);
   };
 
   const generateProjections = () => {
     const years = 10;
-    const growthRate = 0.07; // 7% annual growth
+    const growthRate = 0.07;
     return Array.from({ length: years }, (_, i) => ({
       year: i + 1,
       value: totalInvestment * Math.pow(1 + growthRate, i)
@@ -90,77 +67,54 @@ const ModernInvestmentDashboard = () => {
 
   return (
     <div>
-      <div className="p-4 max-w-6xl mx-auto bg-gray-100">
-        <h1 className="text-3xl font-bold mb-6 text-center text-primary">{config.heading}</h1>
+      <h1 className="text-4xl font-bold mb-6 text-center text-primary">{config.heading}</h1>
 
-        <p className="text-center text-secondary mb-6 px-4 max-w-xl mx-auto">
-          {config.description}
-        </p>
+      <p className="text-center text-secondary mb-6 px-4 max-w-xl mx-auto">
+        {config.description}
+      </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Slider
-            title="Total Investment"
-            min={1000}
-            max={1000000}
-            value={totalInvestment}
-            onChange={(e) => setTotalInvestment(Number(e.target.value))}
-            displayValue={`$${totalInvestment.toLocaleString()}`}
-          />
-          <Slider
-            title="Risk Tolerance"
-            min={1}
-            max={10}
-            value={riskTolerance}
-            onChange={handleRiskToleranceChange}
-            displayValue={`${riskTolerance} / 10`}
-            tooltip="Risk tolerance is how much ups and downs you can handle with your investments. Higher risk tolerance means you're okay with more changes for bigger gains; lower risk tolerance means you prefer steady, smaller gains."
-            coloredNumbers={true}
-          />
-        </div>
-
-        <div className="bg-white p-6 rounded-lg shadow mt-6">
-          <h2 className="text-xl font-semibold mb-4 text-secondary">Allocations</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Object.entries(allocations).map(([symbol, value]) => (
-              <div key={symbol} className="space-y-2">
-                <label className="flex justify-between text-secondary">
-                  <span>{symbol} ({paymentFrequency[symbol]})</span>
-                  <span className="font-medium">{value.toFixed(2)}%</span>
-                </label>
-                <div className="w-full bg-gray-200 rounded-full h-2.5">
-                  <div
-                    className="bg-primary h-2.5 rounded-full"
-                    style={{ width: `${value}%` }}
-                  ></div>
-                </div>
-                <p className="text-sm text-primary">Yield: {yields[symbol]}%</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <TaxSettings
-            includeStateTax={includeStateTax}
-            setIncludeStateTax={setIncludeStateTax}
-            stateTaxRate={stateTaxRate}
-            setStateTaxRate={setStateTaxRate}
-          />
-          <IncomeEstimates
-            annualIncome={annualIncome}
-            monthlyIncome={monthlyIncome}
-            federalTaxRate={federalTaxRate}
-            includeStateTax={includeStateTax}
-            stateTaxRate={stateTaxRate}
-          />
-        </div>
-
-        <ProjectionChart data={generateProjections()} />
-
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Slider
+          title="Total Investment"
+          min={1000}
+          max={1000000}
+          value={totalInvestment}
+          onChange={(e) => setTotalInvestment(Number(e.target.value))}
+          displayValue={`$${totalInvestment.toLocaleString()}`}
+        />
+        <Slider
+          title="Risk Tolerance"
+          min={1}
+          max={10}
+          value={riskTolerance}
+          onChange={handleRiskToleranceChange}
+          displayValue={`${riskTolerance} / 10`}
+          tooltip="Risk tolerance is how much ups and downs you can handle with your investments. Higher risk tolerance means you're okay with more changes for bigger gains; lower risk tolerance means you prefer steady, smaller gains."
+          coloredNumbers={true} // Enable colored numbers
+        />
       </div>
-    </div>
 
+      <AllocationDisplay allocations={allocations} paymentFrequency={paymentFrequency} yields={yields} />
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <TaxSettings
+          includeStateTax={includeStateTax}
+          setIncludeStateTax={setIncludeStateTax}
+          stateTaxRate={stateTaxRate}
+          setStateTaxRate={setStateTaxRate}
+        />
+        <IncomeEstimates
+          annualIncome={annualIncome}
+          monthlyIncome={monthlyIncome}
+          federalTaxRate={federalTaxRate}
+          includeStateTax={includeStateTax}
+          stateTaxRate={stateTaxRate}
+        />
+      </div>
+
+      <ProjectionChart data={generateProjections()} />
+    </div>
   );
 };
 
-export default ModernInvestmentDashboard;
+export default Dashboard;
