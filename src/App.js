@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import Footer from './Footer';
 
@@ -27,32 +27,33 @@ const ModernInvestmentDashboard = () => {
   const aggressive = ['VTI', 'JEPI', 'XOM', 'MAIN'];
 
   // Function to adjust allocations based on risk tolerance
-  const adjustAllocations = (riskLevel) => {
+  const adjustAllocations = useCallback((riskLevel) => {
     const newAllocations = { ...allocations };
     const totalAllocation = 100;
-
+  
     let conservativeAllocation = Math.max(60 - riskLevel * 5, 10); // 60% at risk 0, 10% at risk 10
     let moderateAllocation = 30; // Keeps moderate allocation steady
     let aggressiveAllocation = Math.min(10 + riskLevel * 5, 60); // 10% at risk 0, 60% at risk 10
-
+  
     // Normalize allocations to ensure they sum to 100%
     const total = conservativeAllocation + moderateAllocation + aggressiveAllocation;
     conservativeAllocation = (conservativeAllocation / total) * totalAllocation;
     moderateAllocation = (moderateAllocation / total) * totalAllocation;
     aggressiveAllocation = (aggressiveAllocation / total) * totalAllocation;
-
+  
     // Distribute allocations within each category
     conservative.forEach(symbol => newAllocations[symbol] = conservativeAllocation / conservative.length);
     moderate.forEach(symbol => newAllocations[symbol] = moderateAllocation / moderate.length);
     aggressive.forEach(symbol => newAllocations[symbol] = aggressiveAllocation / aggressive.length);
-
+  
     setAllocations(newAllocations);
-  };
+  }, [allocations, conservative, moderate, aggressive]);
+  
 
   // Update allocations when risk tolerance changes
   useEffect(() => {
     adjustAllocations(riskTolerance);
-  }, [riskTolerance, adjustAllocations]);
+  }, [riskTolerance, adjustAllocations]);  
 
   useEffect(() => {
     const income = Object.keys(allocations).reduce((sum, symbol) => {
