@@ -4,6 +4,7 @@ import IncomeEstimates from './components/IncomeEstimates';
 import ProjectionChart from './components/ProjectionChart';
 import TaxSettings from './components/TaxSettings';
 import config from './config';
+import './css/custom.css';
 
 const ModernInvestmentDashboard = () => {
   const [totalInvestment, setTotalInvestment] = useState(100000);
@@ -112,6 +113,8 @@ const ModernInvestmentDashboard = () => {
             value={riskTolerance}
             onChange={handleRiskToleranceChange}
             displayValue={`${riskTolerance} / 10`}
+            tooltip="Risk tolerance is how much ups and downs you can handle with your investments. Higher risk tolerance means you're okay with more changes for bigger gains; lower risk tolerance means you prefer steady, smaller gains."
+            coloredNumbers={true}
           />
         </div>
 
