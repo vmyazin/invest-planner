@@ -59,12 +59,12 @@ const ModernInvestmentDashboard = () => {
   };
 
   return (
-    <div className="p-4 max-w-6xl mx-auto bg-gray-50">
-      <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">Investment Plan Dashboard</h1>
+    <div className="p-4 max-w-6xl mx-auto bg-gray-100">
+      <h1 className="text-3xl font-bold mb-6 text-center text-blue-600">Investment Plan Dashboard</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white p-4 rounded shadow">
-          <h2 className="text-xl font-semibold mb-2">Total Investment</h2>
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-semibold mb-4">Total Investment</h2>
           <input 
             type="range" 
             min="1000" 
@@ -76,8 +76,8 @@ const ModernInvestmentDashboard = () => {
           <p className="mt-2 text-lg font-medium">${totalInvestment.toLocaleString()}</p>
         </div>
 
-        <div className="bg-white p-4 rounded shadow">
-          <h2 className="text-xl font-semibold mb-2">Risk Tolerance</h2>
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-semibold mb-4">Risk Tolerance</h2>
           <input 
             type="range" 
             min="1" 
@@ -90,7 +90,7 @@ const ModernInvestmentDashboard = () => {
         </div>
       </div>
 
-      <div className="bg-white p-4 rounded shadow mt-6">
+      <div className="bg-white p-6 rounded-lg shadow mt-6">
         <h2 className="text-xl font-semibold mb-4">Allocations</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {Object.entries(allocations).map(([symbol, value]) => (
@@ -113,13 +113,14 @@ const ModernInvestmentDashboard = () => {
         </div>
       </div>
 
-      <div className="bg-white p-4 rounded shadow mt-6">
+      <div className="bg-white p-6 rounded-lg shadow mt-6">
         <h2 className="text-xl font-semibold mb-4">Tax Settings</h2>
         <div className="flex items-center space-x-2">
           <input
             type="checkbox"
             checked={includeStateTax}
             onChange={(e) => setIncludeStateTax(e.target.checked)}
+            className="form-checkbox h-5 w-5 text-blue-600"
           />
           <label>Include State Tax</label>
         </div>
@@ -132,13 +133,13 @@ const ModernInvestmentDashboard = () => {
               max="15"
               value={stateTaxRate}
               onChange={(e) => setStateTaxRate(Number(e.target.value))}
-              className="w-full"
+              className="w-full mt-2"
             />
           </div>
         )}
       </div>
 
-      <div className="bg-white p-4 rounded shadow mt-6">
+      <div className="bg-white p-6 rounded-lg shadow mt-6">
         <h2 className="text-xl font-semibold mb-4">Income Estimates</h2>
         <div className="space-y-2">
           <p><span className="font-medium">Annual (Pre-tax):</span> ${annualIncome.toFixed(2)}</p>
@@ -149,7 +150,7 @@ const ModernInvestmentDashboard = () => {
         </div>
       </div>
 
-      <div className="bg-white p-4 rounded shadow mt-6">
+      <div className="bg-white p-6 rounded-lg shadow mt-6">
         <h2 className="text-xl font-semibold mb-4">10-Year Projection</h2>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={generateProjections()}>
@@ -158,7 +159,7 @@ const ModernInvestmentDashboard = () => {
             <YAxis />
             <Tooltip />
             <Legend />
-            <Line type="monotone" dataKey="value" stroke="#8884d8" />
+            <Line type="monotone" dataKey="value" stroke="#3b82f6" />
           </LineChart>
         </ResponsiveContainer>
       </div>
