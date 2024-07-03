@@ -51,23 +51,23 @@ const ModernInvestmentDashboard = () => {
   // Update allocations when risk tolerance changes
   useEffect(() => {
     adjustAllocations(riskTolerance);
-  }, [riskTolerance]);
+  }, [riskTolerance, adjustAllocations]);
 
   useEffect(() => {
     const income = Object.keys(allocations).reduce((sum, symbol) => {
       return sum + (totalInvestment * (allocations[symbol] / 100) * (yields[symbol] / 100));
     }, 0);
     setAnnualIncome(income);
-
+  
     let taxRate = federalTaxRate;
     if (includeStateTax) {
       taxRate += stateTaxRate;
     }
-
+  
     const afterTaxIncome = income * (1 - taxRate / 100);
     setMonthlyIncome(afterTaxIncome / 12);
-  }, [totalInvestment, allocations, yields, includeStateTax, stateTaxRate]);
-
+  }, [totalInvestment, allocations, yields, includeStateTax, stateTaxRate, federalTaxRate]);
+  
   const handleRiskToleranceChange = (e) => {
     const newRiskTolerance = Number(e.target.value);
     setRiskTolerance(newRiskTolerance);
@@ -87,7 +87,7 @@ const ModernInvestmentDashboard = () => {
     <div className="p-4 max-w-6xl mx-auto bg-gray-100">
       <h1 className="text-3xl font-bold mb-6 text-center text-primary">Investment Plan Dashboard</h1>
 
-      <p className="text-center text-secondary mb-6 px-4 max-w-xl mx-auto">
+      <p className="text-center text-secondary mb-6 px-4 max-w- mx-auto">
         Plan and visualize your investment strategy focused on receiving dividents. 
         Adjust your total investment and risk tolerance to see how it affects your portfolio allocation and potential returns. 
       </p>
