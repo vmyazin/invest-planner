@@ -7,10 +7,10 @@ const ModernInvestmentDashboard = () => {
   const [allocations, setAllocations] = useState({
     SCHD: 20, VTI: 15, JEPI: 10, VIG: 10, JNJ: 5, KO: 5, PG: 5, O: 10, XOM: 5, MAIN: 5, STAG: 5, VTEB: 5
   });
-  const [yields, setYields] = useState({
+  const [yields, _setYields] = useState({
     SCHD: 3.5, VTI: 1.5, JEPI: 7.0, VIG: 1.8, JNJ: 2.7, KO: 3.0, PG: 2.5, O: 5.0, XOM: 3.5, MAIN: 6.5, STAG: 4.5, VTEB: 2.5
   });
-  const [paymentFrequency, setPaymentFrequency] = useState({
+  const [paymentFrequency, _setPaymentFrequency] = useState({
     SCHD: 'Quarterly', VTI: 'Quarterly', JEPI: 'Monthly', VIG: 'Quarterly', JNJ: 'Quarterly', KO: 'Quarterly', 
     PG: 'Quarterly', O: 'Monthly', XOM: 'Quarterly', MAIN: 'Monthly', STAG: 'Monthly', VTEB: 'Monthly'
   });
