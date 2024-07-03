@@ -11,7 +11,7 @@ const ModernInvestmentDashboard = () => {
     SCHD: 3.5, VTI: 1.5, JEPI: 7.0, VIG: 1.8, JNJ: 2.7, KO: 3.0, PG: 2.5, O: 5.0, XOM: 3.5, MAIN: 6.5, STAG: 4.5, VTEB: 2.5
   });
   const [paymentFrequency] = useState({
-    SCHD: 'Quarterly', VTI: 'Quarterly', JEPI: 'Monthly', VIG: 'Quarterly', JNJ: 'Quarterly', KO: 'Quarterly', 
+    SCHD: 'Quarterly', VTI: 'Quarterly', JEPI: 'Monthly', VIG: 'Quarterly', JNJ: 'Quarterly', KO: 'Quarterly',
     PG: 'Quarterly', O: 'Monthly', XOM: 'Quarterly', MAIN: 'Monthly', STAG: 'Monthly', VTEB: 'Monthly'
   });
   const [annualIncome, setAnnualIncome] = useState(0);
@@ -19,6 +19,39 @@ const ModernInvestmentDashboard = () => {
   const [includeStateTax, setIncludeStateTax] = useState(false);
   const [stateTaxRate, setStateTaxRate] = useState(5);
   const federalTaxRate = 15;
+
+  // Categorize investments
+  const conservative = ['VTEB', 'JNJ', 'KO', 'PG'];
+  const moderate = ['SCHD', 'VIG', 'O', 'STAG'];
+  const aggressive = ['VTI', 'JEPI', 'XOM', 'MAIN'];
+
+  // Function to adjust allocations based on risk tolerance
+  const adjustAllocations = (riskLevel) => {
+    const newAllocations = { ...allocations };
+    const totalAllocation = 100;
+
+    let conservativeAllocation = Math.max(60 - riskLevel * 5, 10); // 60% at risk 0, 10% at risk 10
+    let moderateAllocation = 30; // Keeps moderate allocation steady
+    let aggressiveAllocation = Math.min(10 + riskLevel * 5, 60); // 10% at risk 0, 60% at risk 10
+
+    // Normalize allocations to ensure they sum to 100%
+    const total = conservativeAllocation + moderateAllocation + aggressiveAllocation;
+    conservativeAllocation = (conservativeAllocation / total) * totalAllocation;
+    moderateAllocation = (moderateAllocation / total) * totalAllocation;
+    aggressiveAllocation = (aggressiveAllocation / total) * totalAllocation;
+
+    // Distribute allocations within each category
+    conservative.forEach(symbol => newAllocations[symbol] = conservativeAllocation / conservative.length);
+    moderate.forEach(symbol => newAllocations[symbol] = moderateAllocation / moderate.length);
+    aggressive.forEach(symbol => newAllocations[symbol] = aggressiveAllocation / aggressive.length);
+
+    setAllocations(newAllocations);
+  };
+
+  // Update allocations when risk tolerance changes
+  useEffect(() => {
+    adjustAllocations(riskTolerance);
+  }, [riskTolerance]);
 
   useEffect(() => {
     const income = Object.keys(allocations).reduce((sum, symbol) => {
@@ -35,18 +68,10 @@ const ModernInvestmentDashboard = () => {
     setMonthlyIncome(afterTaxIncome / 12);
   }, [totalInvestment, allocations, yields, includeStateTax, stateTaxRate]);
 
-  const handleAllocationChange = (symbol, value) => {
-    setAllocations(prev => {
-      const newAllocations = { ...prev, [symbol]: Number(value) };
-      const total = Object.values(newAllocations).reduce((sum, val) => sum + val, 0);
-      if (total > 100) {
-        const factor = 100 / total;
-        return Object.fromEntries(
-          Object.entries(newAllocations).map(([key, val]) => [key, Math.round(val * factor)])
-        );
-      }
-      return newAllocations;
-    });
+  const handleRiskToleranceChange = (e) => {
+    const newRiskTolerance = Number(e.target.value);
+    setRiskTolerance(newRiskTolerance);
+    adjustAllocations(newRiskTolerance);
   };
 
   const generateProjections = () => {
@@ -61,16 +86,21 @@ const ModernInvestmentDashboard = () => {
   return (
     <div className="p-4 max-w-6xl mx-auto bg-gray-100">
       <h1 className="text-3xl font-bold mb-6 text-center text-primary">Investment Plan Dashboard</h1>
-      
+
+      <p className="text-center text-secondary mb-6 px-4 max-w-xl mx-auto">
+        Plan and visualize your investment strategy focused on receiving dividents. 
+        Adjust your total investment and risk tolerance to see how it affects your portfolio allocation and potential returns. 
+      </p>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white p-6 rounded-lg shadow">
           <h2 className="text-xl font-semibold mb-4 text-secondary">Total Investment</h2>
           <div className="slider-container">
-            <input 
-              type="range" 
-              min="1000" 
-              max="1000000" 
-              value={totalInvestment} 
+            <input
+              type="range"
+              min="1000"
+              max="1000000"
+              value={totalInvestment}
               onChange={(e) => setTotalInvestment(Number(e.target.value))}
               className="w-full"
             />
@@ -81,12 +111,12 @@ const ModernInvestmentDashboard = () => {
         <div className="bg-white p-6 rounded-lg shadow">
           <h2 className="text-xl font-semibold mb-4 text-secondary">Risk Tolerance</h2>
           <div className="slider-container">
-            <input 
-              type="range" 
-              min="1" 
-              max="10" 
-              value={riskTolerance} 
-              onChange={(e) => setRiskTolerance(Number(e.target.value))}
+            <input
+              type="range"
+              min="1"
+              max="10"
+              value={riskTolerance}
+              onChange={handleRiskToleranceChange}
               className="w-full"
             />
           </div>
@@ -101,17 +131,13 @@ const ModernInvestmentDashboard = () => {
             <div key={symbol} className="space-y-2">
               <label className="flex justify-between text-secondary">
                 <span>{symbol} ({paymentFrequency[symbol]})</span>
-                <span className="font-medium">{value}%</span>
+                <span className="font-medium">{value.toFixed(2)}%</span>
               </label>
-              <div className="slider-container">
-                <input 
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={value}
-                  onChange={(e) => handleAllocationChange(symbol, e.target.value)}
-                  className="w-full"
-                />
+              <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div
+                  className="bg-primary h-2.5 rounded-full"
+                  style={{ width: `${value}%` }}
+                ></div>
               </div>
               <p className="text-sm text-primary">Yield: {yields[symbol]}%</p>
             </div>
