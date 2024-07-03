@@ -21,13 +21,12 @@ const ModernInvestmentDashboard = () => {
   const [stateTaxRate, setStateTaxRate] = useState(5);
   const federalTaxRate = 15;
 
-  // Categorize investments
-  const conservative = ['VTEB', 'JNJ', 'KO', 'PG'];
-  const moderate = ['SCHD', 'VIG', 'O', 'STAG'];
-  const aggressive = ['VTI', 'JEPI', 'XOM', 'MAIN'];
-
   // Function to adjust allocations based on risk tolerance
   const adjustAllocations = useCallback((riskLevel) => {
+    const conservative = ['VTEB', 'JNJ', 'KO', 'PG'];
+    const moderate = ['SCHD', 'VIG', 'O', 'STAG'];
+    const aggressive = ['VTI', 'JEPI', 'XOM', 'MAIN'];
+    
     const newAllocations = { ...allocations };
     const totalAllocation = 100;
   
@@ -47,8 +46,8 @@ const ModernInvestmentDashboard = () => {
     aggressive.forEach(symbol => newAllocations[symbol] = aggressiveAllocation / aggressive.length);
   
     setAllocations(newAllocations);
-  }, [allocations, conservative, moderate, aggressive]);
-  
+  }, [allocations]);
+    
 
   // Update allocations when risk tolerance changes
   useEffect(() => {
@@ -166,8 +165,8 @@ const ModernInvestmentDashboard = () => {
                 <label className="text-secondary">State Tax Rate: {stateTaxRate}%</label>
                 <input
                   type="range"
-                  min="0"
-                  max="15"
+                  min="1"
+                  max="20"
                   value={stateTaxRate}
                   onChange={(e) => setStateTaxRate(Number(e.target.value))}
                   className="w-full mt-2 accent-accent"
