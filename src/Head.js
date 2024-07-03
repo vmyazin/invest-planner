@@ -9,7 +9,7 @@ const Head = () => (
       <title>{config.siteName}</title>
       <meta property="og:title" content={config.siteName} />
       <meta property="og:type" content="website" />
-      <meta property="og:image" content={config.ogImage} />
+      <meta property="og:image" content={config.url + config.ogImage} />
       <meta property="og:url" content={config.url} />
       <meta name="description" content={config.description} />
       <meta property="og:description" content={config.description} />
