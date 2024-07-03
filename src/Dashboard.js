@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import Slider from './components/Slider';
+import IncomeEstimates from './components/IncomeEstimates';
+import ProjectionChart from './components/ProjectionChart';
+import TaxSettings from './components/TaxSettings';
 import config from './config';
 
 const ModernInvestmentDashboard = () => {
@@ -27,23 +30,23 @@ const ModernInvestmentDashboard = () => {
       const conservative = ['VTEB', 'JNJ', 'KO', 'PG'];
       const moderate = ['SCHD', 'VIG', 'O', 'STAG'];
       const aggressive = ['VTI', 'JEPI', 'XOM', 'MAIN'];
-  
+
       const newAllocations = { ...prevAllocations };
       const totalAllocation = 100;
-  
+
       let conservativeAllocation = Math.max(60 - riskLevel * 5, 10);
       let moderateAllocation = 30;
       let aggressiveAllocation = Math.min(10 + riskLevel * 5, 60);
-  
+
       const total = conservativeAllocation + moderateAllocation + aggressiveAllocation;
       conservativeAllocation = (conservativeAllocation / total) * totalAllocation;
       moderateAllocation = (moderateAllocation / total) * totalAllocation;
       aggressiveAllocation = (aggressiveAllocation / total) * totalAllocation;
-  
+
       conservative.forEach(symbol => newAllocations[symbol] = conservativeAllocation / conservative.length);
       moderate.forEach(symbol => newAllocations[symbol] = moderateAllocation / moderate.length);
       aggressive.forEach(symbol => newAllocations[symbol] = aggressiveAllocation / aggressive.length);
-  
+
       return newAllocations;
     });
   }, []);
@@ -52,7 +55,7 @@ const ModernInvestmentDashboard = () => {
   // Update allocations when risk tolerance changes
   useEffect(() => {
     adjustAllocations(riskTolerance);
-  }, [riskTolerance, adjustAllocations]);  
+  }, [riskTolerance, adjustAllocations]);
 
   useEffect(() => {
     const income = Object.keys(allocations).reduce((sum, symbol) => {
@@ -94,35 +97,22 @@ const ModernInvestmentDashboard = () => {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4 text-secondary">Total Investment</h2>
-            <div className="slider-container">
-              <input
-                type="range"
-                min="1000"
-                max="1000000"
-                value={totalInvestment}
-                onChange={(e) => setTotalInvestment(Number(e.target.value))}
-                className="w-full"
-              />
-            </div>
-            <p className="mt-2 text-lg font-medium text-primary">${totalInvestment.toLocaleString()}</p>
-          </div>
-
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4 text-secondary">Risk Tolerance</h2>
-            <div className="slider-container">
-              <input
-                type="range"
-                min="1"
-                max="10"
-                value={riskTolerance}
-                onChange={handleRiskToleranceChange}
-                className="w-full"
-              />
-            </div>
-            <p className="mt-2 text-lg font-medium text-primary">{riskTolerance} / 10</p>
-          </div>
+          <Slider
+            title="Total Investment"
+            min={1000}
+            max={1000000}
+            value={totalInvestment}
+            onChange={(e) => setTotalInvestment(Number(e.target.value))}
+            displayValue={`$${totalInvestment.toLocaleString()}`}
+          />
+          <Slider
+            title="Risk Tolerance"
+            min={1}
+            max={10}
+            value={riskTolerance}
+            onChange={handleRiskToleranceChange}
+            displayValue={`${riskTolerance} / 10`}
+          />
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow mt-6">
@@ -147,59 +137,22 @@ const ModernInvestmentDashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-          <div className="bg-white p-6 rounded-lg shadow mt-6">
-            <h2 className="text-xl font-semibold mb-4 text-secondary">Tax Settings</h2>
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={includeStateTax}
-                onChange={(e) => setIncludeStateTax(e.target.checked)}
-                className="form-checkbox h-5 w-5 text-accent"
-              />
-              <label className="text-secondary">Include State Tax</label>
-            </div>
-            {includeStateTax && (
-              <div className="mt-4">
-                <label className="text-secondary">State Tax Rate: {stateTaxRate}%</label>
-                <input
-                  type="range"
-                  min="1"
-                  max="20"
-                  value={stateTaxRate}
-                  onChange={(e) => setStateTaxRate(Number(e.target.value))}
-                  className="w-full mt-2 accent-accent"
-                />
-              </div>
-            )}
-          </div>
-
-          <div className="bg-white p-6 rounded-lg shadow mt-6">
-            <h2 className="text-xl font-semibold mb-4 text-secondary">Income Estimates</h2>
-            <div className="space-y-2 text-secondary">
-              <p><span className="font-medium">Annual (Pre-tax):</span> <span className="text-primary">${annualIncome.toFixed(2)}</span></p>
-              <p><span className="font-medium">Monthly (After-tax):</span> <span className="text-primary">${monthlyIncome.toFixed(2)}</span></p>
-              <p><span className="font-medium">Federal Tax Rate:</span> <span className="text-primary">{federalTaxRate}%</span></p>
-              {includeStateTax && <p><span className="font-medium">State Tax Rate:</span> <span className="text-primary">{stateTaxRate}%</span></p>}
-              <p><span className="font-medium">Total Tax Rate:</span> <span className="text-primary">{includeStateTax ? federalTaxRate + stateTaxRate : federalTaxRate}%</span></p>
-            </div>
-          </div>
-
+          <TaxSettings
+            includeStateTax={includeStateTax}
+            setIncludeStateTax={setIncludeStateTax}
+            stateTaxRate={stateTaxRate}
+            setStateTaxRate={setStateTaxRate}
+          />
+          <IncomeEstimates
+            annualIncome={annualIncome}
+            monthlyIncome={monthlyIncome}
+            federalTaxRate={federalTaxRate}
+            includeStateTax={includeStateTax}
+            stateTaxRate={stateTaxRate}
+          />
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow mt-6">
-          <h2 className="text-xl font-semibold mb-4 text-secondary">10-Year Projection</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={generateProjections()}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="year" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line type="monotone" dataKey="value" stroke="#f6821e" />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+        <ProjectionChart data={generateProjections()} />
 
       </div>
     </div>
