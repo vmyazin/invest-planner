@@ -9,7 +9,7 @@ const config = {
   url: prodUrl,
   ogImage: 'images/'+ ogImageName,
   twitterCreator: "@rapidsystemshub",
-  twitterImage: prodUrl + 'images/' + ogImage,
+  twitterImage: prodUrl + 'images/' + ogImageName,
 };
 
 export default config;
